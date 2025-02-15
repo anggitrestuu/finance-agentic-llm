@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Audit Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Finance Audit Assistant</h1>
+            </div>
+            <div class="categories">
+                <h2>Categories</h2>
+                <button class="category-btn" data-category="Revenue">Revenue Cycle</button>
+                <button class="category-btn" data-category="Expenditure">Expenditure Cycle</button>
+                <button class="category-btn" data-category="Fraud">Fraud Detection</button>
+            </div>
+            <div class="agents">
+                <h2>Agents</h2>
+                <div class="agent-status">
+                    <div class="agent" data-agent="senior-auditor">
+                        <span class="agent-indicator"></span>
+                        Senior Auditor
+                    </div>
+                    <div class="agent" data-agent="it-auditor">
+                        <span class="agent-indicator"></span>
+                        IT Auditor
+                    </div>
+                    <div class="agent" data-agent="report-manager">
+                        <span class="agent-indicator"></span>
+                        Report Manager
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input-container">
+                    <textarea 
+                        id="chat-input" 
+                        placeholder="Ask a question about audit analysis..."
+                    ></textarea>
+                    <button id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message template -->
+    <template id="message-template">
+        <div class="message">
+            <div class="message-header">
+                <span class="message-role"></span>
+                <span class="message-time"></span>
+            </div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>

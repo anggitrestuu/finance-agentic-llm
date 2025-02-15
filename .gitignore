@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Database
+*.db
+*.sqlite3
+
+/storage_data/
+/test_storage_data/
+/web/
+
+poetry.lock
+.venv/
+.pytest_cache/
+
+implementation_plan.md
+lm_2-Agentic_01.ipynb
+finance-audit-agentic.ipynb
+/logs/
+/LLMDataset/
+.DS_Store
