@@ -99,6 +99,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                     "timestamp": datetime.now().isoformat(),
                     "data": response
                 }
+
+                print("Formatted Response: ", formatted_response)
                 
                 # Store in chat history
                 manager.add_to_history(client_id, {
