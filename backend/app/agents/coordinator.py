@@ -78,10 +78,14 @@ class AgentCoordinator:
                 schemas=schemas
             )
 
+            it_auditor_task = self.it_auditor.get_task()
+
+            report_manager_task = self.report_manager.get_task()
+
             # Create and execute crew
             crew = Crew(
-                agents=[self.senior_auditor.agent],
-                tasks=[interpret_task],
+                agents=[self.senior_auditor.agent, self.it_auditor.agent, self.report_manager.agent],
+                tasks=[interpret_task, it_auditor_task, report_manager_task],
                 max_rpm=20,
                 max_tokens=4000,
                 verbose=True

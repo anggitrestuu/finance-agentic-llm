@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     
     # LLM Settings
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
-    MODEL_NAME: str = "gpt-4"  # or another model of choice
+    MODEL_NAME: str = "groq/deepseek-r1" 
     
     # Agent Settings
     ENABLE_AGENT_LOGGING: bool = True
