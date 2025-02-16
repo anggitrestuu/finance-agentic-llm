@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 import json
 import logging
 from datetime import datetime
+import os
 
 from .config import settings
 from .database.models import DatabaseManager
@@ -85,11 +86,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             try:
                 request_data = json.loads(message)
 
-                print(f"Received message: {request_data}")
-
                 response = await agent_coordinator.execute_audit(audit_info=request_data)
 
-                print(f"Response: {response}")
                 
                 # Format response
                 formatted_response = {
@@ -166,6 +164,31 @@ async def get_dataset_categories():
 async def get_dataset_metadata():
     """Get metadata about all CSV files"""
     return csv_processor.get_csv_metadata()
+
+@app.get("/dataset/{category}/tables")
+async def get_category_tables(category: str):
+    """Get all tables and their schemas for a specific category"""
+    # Get all categories
+    categories = csv_processor.get_dataset_categories()
+    
+    # Check if category exists
+    if category not in categories:
+        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+    
+    # Get tables for this category
+    table_schemas = {}
+    for csv_file in categories[category]:
+        table_name = os.path.splitext(csv_file)[0].lower()
+        try:
+            table_schemas[table_name] = db_manager.get_table_schema(table_name)
+        except ValueError:
+            # Skip tables that haven't been created yet
+            continue
+    
+    return {
+        "category": category,
+        "tables": table_schemas
+    }
 
 @app.post("/dataset/sync")
 async def sync_dataset():
