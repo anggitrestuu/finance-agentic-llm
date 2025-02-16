@@ -87,10 +87,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 
                 print(f"Received message: {request_data}")
 
-                response = await agent_coordinator.process_query(
-                    query=request_data.get("message"),
-                    context=request_data.get("context")
-                )
+                response = await agent_coordinator.execute_audit(audit_info=request_data)
 
                 print(f"Response: {response}")
                 
