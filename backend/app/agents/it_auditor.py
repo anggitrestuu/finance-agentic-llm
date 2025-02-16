@@ -27,13 +27,12 @@ class ITAuditorAgent:
             recognition, and technical control assessment. You work closely with the 
             Senior Auditor to provide detailed technical insights.""",
             verbose=True,
-            allow_delegation=True,
             llm=self.llm,
             tools=self._create_tools(),
-            max_iter=2
+            max_iter=5
         )
     
-    def get_task(self, audit_plan: Dict[str, Any]) -> Task:
+    def get_task(self) -> Task:
         return Task(
             description="""
                 You need to do this in sequence:

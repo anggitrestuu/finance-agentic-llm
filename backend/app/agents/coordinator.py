@@ -20,17 +20,17 @@ class AgentCoordinator:
         try:
             # Create tasks
             interpret_task = self.senior_auditor.get_task(audit_info.get("message"))  # Will be updated with user query
-            analyze_task = self.it_auditor.get_task({})  # Will be updated with audit plan
-            report_task = self.report_manager.get_task({})  # Will be updated with audit findings
+            analyze_task = self.it_auditor.get_task()  # Will be updated with audit plan
+            report_task = self.report_manager.get_task()  # Will be updated with audit findings
             
             # Create and execute crew
             crew = Crew(
                 agents=[
                     self.senior_auditor.agent,
-                    # self.it_auditor.agent,
-                    # self.report_manager.agent
+                    self.it_auditor.agent,
+                    self.report_manager.agent
                 ],
-                tasks=[interpret_task],
+                tasks=[interpret_task, analyze_task, report_task],
                 max_rpm=20,
                 max_tokens=4000,
                 verbose=True

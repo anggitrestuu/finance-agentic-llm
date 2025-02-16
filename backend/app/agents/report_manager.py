@@ -16,12 +16,11 @@ class AuditReportManager:
             communicating technical findings to various stakeholders and providing 
             strategic recommendations based on audit results.""",
             verbose=True,
-            allow_delegation=True,
             llm=self.llm,
-            max_iter=1
+            max_iter=2
         )
     
-    def get_task(self, audit_plan: Dict[str, Any]) -> Task:
+    def get_task(self) -> Task:
         return Task(
             description="""Using the python dataset analysis results provided by the IT Auditor Team, write an engaging and comprehensive audit report.
                 Your report should be:

@@ -17,7 +17,6 @@ class SeniorAuditorAgent:
             and coordinate with IT auditors for detailed investigations. You have extensive experience in 
             identifying high-risk areas and ensuring compliance with auditing standards.""",
             verbose=True,
-            allow_delegation=True,
             llm=self.llm,
             max_iter=2
         )
