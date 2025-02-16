@@ -1,6 +1,6 @@
 from crewai import Agent, Task
 from langchain.tools import Tool
-from typing import List, Dict
+from typing import List, Dict, Any
 
 class SeniorAuditorAgent:
     def __init__(self, llm=None):
@@ -21,17 +21,22 @@ class SeniorAuditorAgent:
             max_iter=2
         )
 
-    def get_task(self, problem: str) -> Task:
+    def get_task(self, problem: str, category : str, schemas : Any) -> Task:
         return Task(
             description=f"""
             You need to do the following action in one step, and should not request additional information
 
             You need to make actionabe plan for the IT Auditor, in the following guidelines:
             1. Understand the specific audit cycle and assertion that are being asked
-            2. Read the metadata and understand how each file and column can relate to each other in planning the audit plan
-            3. Make specific and concise audit plan to be carried out by Senior IT Auditor, including the SQL statement,so it can effectively use SQL query to analyze the dataset
-            4. Set specific rule and criteria, given the audit cycle and assertion
-            5. Show the output in 'result' variable
+            2. Read and analyze the database schema information for the given audit category. Each category has specific tables with their schema that you need to utilize:
+
+            Example schema for {category} category:
+            {schemas}
+
+            3. Understand how each table and column relate to each other in planning the audit plan
+            4. Make specific and concise audit plan to be carried out by Senior IT Auditor, including the SQL statement,so it can effectively use SQL query to analyze the dataset
+            5. Set specific rule and criteria, given the audit cycle and assertion
+            6. Show the output in 'result' variable
 
             Below is the information about the cycle, assertion, and metadata:
             {problem}

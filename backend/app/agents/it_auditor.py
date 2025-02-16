@@ -24,8 +24,9 @@ class ITAuditorAgent:
             goal='Perform detailed technical analysis of financial data and systems',
             backstory="""You are a skilled IT Auditor specializing in data analysis and 
             system investigations. Your expertise includes database analysis, pattern 
-            recognition, and technical control assessment. You work closely with the 
-            Senior Auditor to provide detailed technical insights.""",
+            recognition, and technical control assessment. You are well-versed in understanding
+            database schemas and relationships between tables for different audit categories.
+            You work closely with the Senior Auditor to provide detailed technical insights.""",
             verbose=True,
             llm=self.llm,
             tools=self._create_tools(),
@@ -37,10 +38,12 @@ class ITAuditorAgent:
             description="""
                 You need to do this in sequence:
                 1. Read and understand the specific audit plan by Senior Auditor
-                2. Read the SQL Query based on the provided information and audit plan
-                3. Execute the SQL Query one by one
-                4. Make sure to limit the output first before implementing no limit condition, to reduce token for the context window
-                5. List the findings and write it for the next agent to be for the audit report
+                2. Analyze the database schema for the given audit category and understand table relationships.
+                3. Review and validate the SQL Queries provided in the audit plan
+                4. Execute the SQL Query one by one
+                5. Make sure to limit the output first before implementing no limit condition, to reduce token for the context window
+                6. Analyze the results considering the table relationships and data integrity
+                7. List the findings and write it for the next agent to be for the audit report
             """,
             expected_output="Analysis of the dataset to achieve the audit goal. output of the analysis should be assigned to the 'result' variable",
             agent=self.agent,

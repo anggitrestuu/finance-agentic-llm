@@ -10,6 +10,7 @@ from .config import settings
 from .database.models import DatabaseManager
 from .utils.csv_processor import CSVProcessor
 from .agents.coordinator import AgentCoordinator
+from .services.dataset_service import DatasetService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +34,8 @@ csv_processor = CSVProcessor(
     dataset_path=settings.DATASET_PATH,
     db_manager=db_manager
 )
-agent_coordinator = AgentCoordinator(db_manager=db_manager)
+dataset_service = DatasetService(db_manager=db_manager, csv_processor=csv_processor)
+agent_coordinator = AgentCoordinator(db_manager=db_manager, dataset_service=dataset_service)
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -87,8 +89,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 request_data = json.loads(message)
 
                 print("Audit Info: ", request_data)
-
-                return None
 
                 response = await agent_coordinator.execute_audit(audit_info=request_data)
 
@@ -162,37 +162,17 @@ async def get_table_schema(table_name: str) -> Dict:
 @app.get("/dataset/categories")
 async def get_dataset_categories():
     """Get all dataset categories and their files"""
-    return csv_processor.get_dataset_categories()
+    return dataset_service.get_all_categories()
 
 @app.get("/dataset/metadata")
 async def get_dataset_metadata():
     """Get metadata about all CSV files"""
-    return csv_processor.get_csv_metadata()
+    return dataset_service.get_dataset_metadata()
 
 @app.get("/dataset/{category}/tables")
 async def get_category_tables(category: str):
     """Get all tables and their schemas for a specific category"""
-    # Get all categories
-    categories = csv_processor.get_dataset_categories()
-    
-    # Check if category exists
-    if category not in categories:
-        raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
-    
-    # Get tables for this category
-    table_schemas = {}
-    for csv_file in categories[category]:
-        table_name = os.path.splitext(csv_file)[0].lower()
-        try:
-            table_schemas[table_name] = db_manager.get_table_schema(table_name)
-        except ValueError:
-            # Skip tables that haven't been created yet
-            continue
-    
-    return {
-        "category": category,
-        "tables": table_schemas
-    }
+    return dataset_service.get_category_table_schemas(category)
 
 @app.post("/dataset/sync")
 async def sync_dataset():
