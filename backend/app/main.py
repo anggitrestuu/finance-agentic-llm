@@ -86,6 +86,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             try:
                 request_data = json.loads(message)
 
+                print("Audit Info: ", request_data)
+
+                return None
+
                 response = await agent_coordinator.execute_audit(audit_info=request_data)
 
                 
