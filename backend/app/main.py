@@ -87,6 +87,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             # Process message through agent coordinator
             try:
                 request_data = json.loads(message)
+                
+                # Add client_id to request_data
+                request_data["client_id"] = client_id
 
                 print("Audit Info: ", request_data)
 
