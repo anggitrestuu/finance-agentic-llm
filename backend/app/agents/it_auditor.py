@@ -1,5 +1,5 @@
-from typing import List, Dict, Any, Optional
-from crewai import Agent, Task
+from typing import List, Any
+from crewai import LLM, Agent, Task
 from langchain.tools import Tool
 from crewai.tools import tool
 from langchain_community.tools.sql_database.tool import (
@@ -69,18 +69,25 @@ class DatabaseTools:
 class ITAuditorAgent:
     """Agent responsible for technical analysis of financial data"""
     
-    def __init__(self, db_manager: Any, llm: Optional[Any] = None):
+    def __init__(self, db_manager: Any):
         """
         Initialize IT Auditor agent
         
         Args:
             db_manager: Database manager instance
-            llm: Language model instance (optional)
         """
-        self.llm = llm
+        self.llm = self._setup_llm()
         self.db_manager = db_manager
         self.db_tools = DatabaseTools(settings.DATABASE_URL)
         self.agent = self._create_agent()
+    
+    def _setup_llm(self) -> LLM:
+        return LLM(
+            model="groq/llama3-8b-8192",
+            api_key=settings.GROQ_API_KEY,
+            temperature=0.4,
+            max_tokens=5000
+        )
 
     def _create_agent(self) -> Agent:
         """Create and configure the IT Auditor agent"""
@@ -95,7 +102,10 @@ class ITAuditorAgent:
             verbose=True,
             llm=self.llm,
             tools=self.db_tools.tools,
-            max_iter=5
+            max_iter=8,
+            max_rpm=20,
+            max_tokens=4000,
+            cache=True
         )
     
     def get_task(self) -> Task:

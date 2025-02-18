@@ -1,5 +1,5 @@
-from typing import Optional, Any
-from crewai import Agent, Task
+from crewai import Agent, Task, LLM
+from ..config import settings
 
 class AuditReportManager:
     """
@@ -9,15 +9,20 @@ class AuditReportManager:
     into well-structured, readable reports for stakeholders.
     """
     
-    def __init__(self, llm: Optional[Any] = None):
+    def __init__(self):
         """
         Initialize the Audit Report Manager
-        
-        Args:
-            llm: Language model instance (optional)
         """
-        self.llm = llm
+        self.llm = self._setup_llm()
         self.agent = self._create_agent()
+    
+    def _setup_llm(self) -> LLM:
+        return LLM(
+            model="groq/llama3-8b-8192",
+            api_key=settings.GROQ_API_KEY,
+            temperature=0.4,
+            max_tokens=5000
+        )
 
     def _create_agent(self) -> Agent:
         """
@@ -36,7 +41,9 @@ class AuditReportManager:
             between technical details and business implications.""",
             verbose=True,
             llm=self.llm,
-            max_iter=2
+            max_iter=1,
+            max_rpm=10,
+            cache=True
         )
     
     def get_task(self) -> Task:

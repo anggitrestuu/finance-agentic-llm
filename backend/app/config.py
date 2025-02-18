@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     
     # LLM Settings
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+    GROQ_API_KEY: Optional[str] = os.getenv("GROQ_API_KEY")
     MODEL_NAME: str = "groq/deepseek-r1" 
     
     # Agent Settings
@@ -40,28 +41,15 @@ class Settings(BaseSettings):
             "title": self.APP_NAME,
             "version": self.APP_VERSION,
             "debug": self.DEBUG
-        }
-    
-    @property
-    def llm_settings(self):
-        """Get LLM-specific settings"""
-        return {
-            "model_name": self.MODEL_NAME,
-            "api_key": self.OPENAI_API_KEY,
-            "max_tokens": self.MAX_TOKENS_PER_RESPONSE
-        }
-    
-    @property
-    def database_settings(self):
-        """Get database-specific settings"""
-        return {
-            "url": self.DATABASE_URL
-        }
+        } 
     
     def validate_settings(self):
         """Validate required settings"""
         if not self.OPENAI_API_KEY:
             raise ValueError("OPENAI_API_KEY must be set in environment variables")
+        
+        if not self.GROQ_API_KEY:
+            raise ValueError("GROQ_API_KEY must be set in environment variables")
         
         if not os.path.exists(self.DATASET_PATH):
             raise ValueError(f"Dataset path does not exist: {self.DATASET_PATH}")

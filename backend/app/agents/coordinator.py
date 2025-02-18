@@ -44,12 +44,10 @@ class AgentCoordinator:
         self, 
         db_manager: DatabaseManager, 
         dataset_service: DatasetService, 
-        llm: Optional[Any] = None,
         max_history: int = 5
     ):
         self.db_manager = db_manager
         self.dataset_service = dataset_service
-        self.llm = llm
         
         # Initialize chat history manager
         self.chat_history = ChatHistory(max_history=max_history)
@@ -59,9 +57,9 @@ class AgentCoordinator:
 
     def _initialize_agents(self) -> None:
         """Initialize all required agents"""
-        self.senior_auditor = SeniorAuditorAgent(llm=self.llm)
-        self.it_auditor = ITAuditorAgent(db_manager=self.db_manager, llm=self.llm)
-        self.report_manager = AuditReportManager(llm=self.llm)
+        self.senior_auditor = SeniorAuditorAgent()
+        self.it_auditor = ITAuditorAgent(db_manager=self.db_manager)
+        self.report_manager = AuditReportManager()
 
     def _validate_audit_info(self, audit_info: Dict[str, Any]) -> None:
         """Validate required audit information"""

@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
-from crewai import Agent, Task
+from crewai import Agent, Task, LLM
+from ..config import settings
 
 class SeniorAuditorAgent:
     """
@@ -9,16 +10,24 @@ class SeniorAuditorAgent:
     working with other agents to ensure comprehensive coverage and risk assessment.
     """
     
-    def __init__(self, llm: Optional[Any] = None):
+    def __init__(self):
         """
         Initialize the Senior Auditor agent
         
         Args:
             llm: Language model instance (optional)
         """
-        self.llm = llm
+        self.llm = self._setup_llm()
         self.agent = self._create_agent()
 
+    def _setup_llm(self) -> LLM:
+        return LLM(
+            model="groq/deepseek-r1-distill-llama-70b",
+            api_key=settings.GROQ_API_KEY,
+            temperature=0.4,
+            max_tokens=5000
+        )
+    
     def _create_agent(self) -> Agent:
         """
         Create and configure the Senior Auditor agent
@@ -38,8 +47,10 @@ class SeniorAuditorAgent:
             - Cross-functional team coordination
             - Complex data analysis planning""",
             verbose=True,
+            max_rpm=20,
+            max_tokens=4000,
+            cache=True,
             llm=self.llm,
-            max_iter=2
         )
     
     def get_task(self, problem: str, category: str, schemas: Any) -> Task:
