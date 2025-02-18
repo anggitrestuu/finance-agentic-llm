@@ -1,6 +1,6 @@
+from typing import List, Dict, Any, Optional
 from crewai import Agent, Task
 from langchain.tools import Tool
-from typing import List, Dict, Any
 from crewai.tools import tool
 from langchain_community.tools.sql_database.tool import (
     InfoSQLDatabaseTool,
@@ -10,15 +10,80 @@ from langchain_community.tools.sql_database.tool import (
 from langchain_community.utilities.sql_database import SQLDatabase
 from ..config import settings
 
+class DatabaseTools:
+    """Collection of database interaction tools"""
+    
+    def __init__(self, database_url: str):
+        self.db = SQLDatabase.from_uri(database_url)
+        self.tools = self._initialize_tools()
+    
+    def _initialize_tools(self) -> List[Tool]:
+        """Initialize and return all database tools"""
+        
+        @tool("list_tables")
+        def list_tables() -> str:
+            """List all available tables in the database"""
+            try:
+                return ListSQLDatabaseTool(db=self.db).invoke("")
+            except Exception as e:
+                return f"Error listing tables: {str(e)}"
+        
+        @tool("tables_schema")
+        def tables_schema(tables: str) -> str:
+            """
+            Get schema and sample rows for specified tables.
+            
+            Args:
+                tables: Comma-separated list of table names
+                
+            Returns:
+                Schema information and sample data for the specified tables
+            """
+            try:
+                return InfoSQLDatabaseTool(db=self.db).invoke(tables)
+            except Exception as e:
+                return f"Error getting schema for tables {tables}: {str(e)}"
+        
+        @tool("execute_sql")
+        def execute_sql(sql_query: str) -> str:
+            """
+            Execute SQL query and return results
+            
+            Args:
+                sql_query: Valid SQL query to execute
+                
+            Returns:
+                Query results or error message if query fails
+            """
+            try:
+                return QuerySQLDatabaseTool(db=self.db).invoke(sql_query)
+            except Exception as e:
+                return f"Error executing query: {str(e)}\nQuery: {sql_query}"
+        
+        return [
+            list_tables,
+            tables_schema,
+            execute_sql
+        ]
+
 class ITAuditorAgent:
-    def __init__(self, db_manager, llm=None):
+    """Agent responsible for technical analysis of financial data"""
+    
+    def __init__(self, db_manager: Any, llm: Optional[Any] = None):
+        """
+        Initialize IT Auditor agent
+        
+        Args:
+            db_manager: Database manager instance
+            llm: Language model instance (optional)
+        """
         self.llm = llm
         self.db_manager = db_manager
+        self.db_tools = DatabaseTools(settings.DATABASE_URL)
         self.agent = self._create_agent()
-        self.tools = self._create_tools()
 
     def _create_agent(self) -> Agent:
-        """Create the IT Auditor agent with specific traits and goals"""
+        """Create and configure the IT Auditor agent"""
         return Agent(
             role='IT Auditor',
             goal='Perform detailed technical analysis of financial data and systems',
@@ -29,53 +94,29 @@ class ITAuditorAgent:
             You work closely with the Senior Auditor to provide detailed technical insights.""",
             verbose=True,
             llm=self.llm,
-            tools=self._create_tools(),
+            tools=self.db_tools.tools,
             max_iter=5
         )
     
     def get_task(self) -> Task:
+        """Create and return the IT Auditor's task"""
         return Task(
             description="""
-                You need to do this in sequence:
-                1. Read and understand the specific audit plan by Senior Auditor
-                2. Analyze the database schema for the given audit category and understand table relationships.
-                3. Review and validate the SQL Queries provided in the audit plan
-                4. Execute the SQL Query one by one
-                5. Make sure to limit the output first before implementing no limit condition, to reduce token for the context window
-                6. Analyze the results considering the table relationships and data integrity
-                7. List the findings and write it for the next agent to be for the audit report
+                Follow these steps sequentially:
+                1. Review and understand the Senior Auditor's audit plan
+                2. Analyze the database schema for the given audit category
+                3. Validate and verify the proposed SQL queries
+                4. Execute queries with appropriate limits for testing
+                5. Remove limits for final execution if results are valid
+                6. Analyze results considering data relationships
+                7. Document findings for the audit report
+                
+                Important considerations:
+                - Always test queries with limits first
+                - Validate data integrity across related tables
+                - Document any anomalies or patterns found
+                - Prepare clear, structured output for reporting
             """,
-            expected_output="Analysis of the dataset to achieve the audit goal. output of the analysis should be assigned to the 'result' variable",
+            expected_output="Comprehensive analysis results stored in the 'result' variable",
             agent=self.agent,
         )
-
-    def _create_tools(self) -> List[Tool]:
-        """Create tools available to the IT Auditor"""
-
-        db = SQLDatabase.from_uri(settings.DATABASE_URL)
-
-        @tool("list_tables")
-        def list_tables() -> str:
-            """List the available tables in the database"""
-            return ListSQLDatabaseTool(db=db).invoke("")
-        
-        @tool("tables_schema")
-        def tables_schema(tables: str) -> str:
-            """
-            Input is a comma-separated list of tables, output is the schema and sample rows
-            for those tables. Be sure that the tables actually exist by calling `list_tables` first!
-            Example Input: table1, table2, table3
-            """
-            tool = InfoSQLDatabaseTool(db=db)
-            return tool.invoke(tables)
-        
-        @tool("execute_sql")
-        def execute_sql(sql_query: str) -> str:
-            """Execute a SQL query against the database. Returns the result"""
-            return QuerySQLDatabaseTool(db=db).invoke(sql_query)
-
-        return [
-            list_tables,
-            tables_schema,
-            execute_sql
-        ]

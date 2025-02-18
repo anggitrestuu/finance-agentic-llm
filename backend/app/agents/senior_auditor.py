@@ -1,46 +1,91 @@
+from typing import Any, Dict, Optional
 from crewai import Agent, Task
-from langchain.tools import Tool
-from typing import List, Dict, Any
 
 class SeniorAuditorAgent:
-    def __init__(self, llm=None):
+    """
+    Senior Auditor agent responsible for creating and managing audit plans.
+    
+    This class handles the high-level planning and strategy for financial audits,
+    working with other agents to ensure comprehensive coverage and risk assessment.
+    """
+    
+    def __init__(self, llm: Optional[Any] = None):
+        """
+        Initialize the Senior Auditor agent
+        
+        Args:
+            llm: Language model instance (optional)
+        """
         self.llm = llm
         self.agent = self._create_agent()
 
     def _create_agent(self) -> Agent:
-        """Create the Senior Auditor agent with specific traits and goals"""
+        """
+        Create and configure the Senior Auditor agent
+        
+        Returns:
+            Agent: Configured agent instance
+        """
         return Agent(
             role='Senior Auditor',
             goal='Create comprehensive and actionable audit plans for financial data analysis',
             backstory="""You are a highly experienced Senior Auditor with expertise in financial auditing 
-            and risk assessment. Your role is to analyze audit requirements, create strategic audit plans, 
-            and coordinate with IT auditors for detailed investigations. You have extensive experience in 
-            identifying high-risk areas and ensuring compliance with auditing standards.""",
+            and risk assessment. Your role involves analyzing audit requirements, creating strategic audit 
+            plans, and coordinating with IT auditors for detailed investigations. You excel at:
+            - Risk assessment and prioritization
+            - Compliance with auditing standards
+            - Strategic planning and execution
+            - Cross-functional team coordination
+            - Complex data analysis planning""",
             verbose=True,
             llm=self.llm,
             max_iter=2
         )
-
-    def get_task(self, problem: str, category : str, schemas : Any) -> Task:
+    
+    def get_task(self, problem: str, category: str, schemas: Any) -> Task:
+        """
+        Create an audit planning task
+        
+        Args:
+            problem: Audit problem or question to address
+            category: Audit category being investigated
+            schemas: Database schema information for relevant tables
+            
+        Returns:
+            Task: Configured audit planning task
+        """
         return Task(
             description=f"""
-            You need to do the following action in one step, and should not request additional information
-
-            You need to make actionabe plan for the IT Auditor, in the following guidelines:
-            1. Understand the specific audit cycle and assertion that are being asked
-            2. Read and analyze the database schema information for the given audit category. Each category has specific tables with their schema that you need to utilize:
-
-            Example schema for {category} category:
-            {schemas}
-
-            3. Understand how each table and column relate to each other in planning the audit plan
-            4. Make specific and concise audit plan to be carried out by Senior IT Auditor, including the SQL statement,so it can effectively use SQL query to analyze the dataset
-            5. Set specific rule and criteria, given the audit cycle and assertion
-            6. Show the output in 'result' variable
-
-            Below is the information about the cycle, assertion, and metadata:
+            Create a comprehensive audit plan following these steps:
+            
+            1. Audit Context Analysis:
+               - Review the specific audit cycle and assertions
+               - Identify key risk areas and focus points
+               - Determine compliance requirements
+            
+            2. Database Schema Analysis:
+               Schema for {category} category:
+               {schemas}
+               
+               - Analyze table relationships and dependencies
+               - Identify key data points for investigation
+               - Map data flow between tables
+            
+            3. Audit Plan Development:
+               - Define specific audit procedures
+               - Create detailed SQL queries for data analysis
+               - Set clear criteria and thresholds
+               - Establish validation checkpoints
+            
+            Input Context:
             {problem}
+            
+            Guidelines:
+            - Ensure queries are optimized and efficient
+            - Include data validation steps
+            - Consider data completeness and accuracy
+            - Align with audit standards and regulations
             """,
-            expected_output="Provide a concise and clear actionable and SQL statement for an IT auditor. Ensure it includes explicit criteria for audit goal.",
+            expected_output="Detailed audit plan with specific procedures and SQL queries, stored in 'result' variable",
             agent=self.agent,
         )

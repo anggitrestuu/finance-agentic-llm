@@ -1,42 +1,82 @@
+from typing import Optional, Any
 from crewai import Agent, Task
-from typing import Dict, Any
 
 class AuditReportManager:
-    def __init__(self, llm=None):
+    """
+    Manages the creation and formatting of audit reports.
+    
+    This class is responsible for taking raw audit findings and converting them
+    into well-structured, readable reports for stakeholders.
+    """
+    
+    def __init__(self, llm: Optional[Any] = None):
+        """
+        Initialize the Audit Report Manager
+        
+        Args:
+            llm: Language model instance (optional)
+        """
         self.llm = llm
         self.agent = self._create_agent()
 
     def _create_agent(self) -> Agent:
-        """Create the Audit Report Manager agent with specific traits and goals"""
+        """
+        Create and configure the Audit Report Manager agent
+        
+        Returns:
+            Agent: Configured agent instance
+        """
         return Agent(
             role='Audit Report Manager',
             goal='Create comprehensive and compelling audit reports with clear insights and recommendations',
             backstory="""You are an experienced Audit Report Manager with expertise in 
             synthesizing complex findings into clear, actionable reports. You excel at 
             communicating technical findings to various stakeholders and providing 
-            strategic recommendations based on audit results.""",
+            strategic recommendations based on audit results. Your reports bridge the gap
+            between technical details and business implications.""",
             verbose=True,
             llm=self.llm,
             max_iter=2
         )
     
     def get_task(self) -> Task:
+        """
+        Create the report generation task
+        
+        Returns:
+            Task: Configured task for report generation
+        """
         return Task(
-            description="""Using the python dataset analysis results provided by the IT Auditor Team, write an engaging and comprehensive audit report.
-                Your report should be:
-                - Informative and accessible to a non-technical audience.
-                - Clear and concise, avoiding complex jargon to ensure readability.
-                - Comprehensive, covering the audit procedures and associated audit findings.
+            description="""
+                Transform the technical audit findings into a clear, comprehensive report.
                 
-                Your report should include:
-                - A brief introduction that provides context for the audit.
-                - A detailed description of the performed audit procedures.
-                - A thorough presentation of the obtained audit findings, including payment details.
-                - Actionable recommendations based on the findings.
-                - A final conclusion that summarizes the key points and implications.
+                Report Requirements:
+                1. Executive Summary:
+                   - Brief overview of audit scope
+                   - Key findings and recommendations
+                   - Overall risk assessment
                 
-                The goal is to create a report that effectively communicates the audit findings and provides valuable insights to stakeholders. 
-                As the report-writing expert, you are responsible for producing this report without requesting additional information. Utilize the provided data and insights to complete your task effectively.""",
-            expected_output="A full audit report presented in a clear and accessible manner.",
+                2. Detailed Findings:
+                   - Technical analysis results
+                   - Data anomalies and patterns
+                   - Supporting evidence and metrics
+                
+                3. Recommendations:
+                   - Actionable steps for improvement
+                   - Priority levels for each recommendation
+                   - Implementation considerations
+                
+                4. Conclusion:
+                   - Summary of critical points
+                   - Next steps and follow-up items
+                
+                Guidelines:
+                - Use clear, non-technical language
+                - Include relevant data visualizations
+                - Prioritize findings by business impact
+                - Provide context for technical findings
+                - Focus on actionable insights
+                """,
+            expected_output="A comprehensive audit report formatted for clarity and impact",
             agent=self.agent,
         )
