@@ -22,10 +22,10 @@ class SeniorAuditorAgent:
 
     def _setup_llm(self) -> LLM:
         return LLM(
-            model="groq/deepseek-r1-distill-llama-70b",
-            api_key=settings.GROQ_API_KEY,
-            temperature=0.4,
-            max_tokens=5000
+            model="o3-mini",
+            api_key=settings.OPENAI_API_KEY,
+            # temperature=0.4,
+            # max_tokens=5000
         )
     
     def _create_agent(self) -> Agent:
@@ -37,15 +37,9 @@ class SeniorAuditorAgent:
         """
         return Agent(
             role='Senior Auditor',
-            goal='Create comprehensive and actionable audit plans for financial data analysis',
-            backstory="""You are a highly experienced Senior Auditor with expertise in financial auditing 
-            and risk assessment. Your role involves analyzing audit requirements, creating strategic audit 
-            plans, and coordinating with IT auditors for detailed investigations. You excel at:
-            - Risk assessment and prioritization
-            - Compliance with auditing standards
-            - Strategic planning and execution
-            - Cross-functional team coordination
-            - Complex data analysis planning""",
+            goal='Given the input from user, make comprehensive and actionable audit plan for IT auditor',
+            backstory="""You are a skilled Senior Auditor, 
+                celebrated for your ability to make comprehensive and actionable audit plan for the other members given the provided information""",
             verbose=True,
             max_rpm=20,
             max_tokens=4000,
@@ -67,36 +61,26 @@ class SeniorAuditorAgent:
         """
         return Task(
             description=f"""
-            Create a comprehensive audit plan following these steps:
-            
-            1. Audit Context Analysis:
-               - Review the specific audit cycle and assertions
-               - Identify key risk areas and focus points
-               - Determine compliance requirements
-            
-            2. Database Schema Analysis:
+            You need to do the following action in one step, and should not request additional information
+
+            You need to make actionabe plan for the IT Auditor, in the following guidelines:
+            1. Understand the specific audit cycle and assertion that are being asked
+            2. Read the metadata and understand how each file and column can relate to each other in planning the audit plan
+            3. Make specific and concise audit plan to be carried out by Senior IT Auditor, including the SQL statement,so it can effectively use SQL query to analyze the dataset
+            4. Set specific rule and criteria, given the audit cycle and assertion
+            5. Show the output in 'result' variable
+
+            Below is the information about the cycle, assertion, and metadata:
+            {problem}
+
+            Database Schema Analysis:
                Schema for {category} category:
                {schemas}
                
                - Analyze table relationships and dependencies
                - Identify key data points for investigation
                - Map data flow between tables
-            
-            3. Audit Plan Development:
-               - Define specific audit procedures
-               - Create detailed SQL queries for data analysis
-               - Set clear criteria and thresholds
-               - Establish validation checkpoints
-            
-            Input Context:
-            {problem}
-            
-            Guidelines:
-            - Ensure queries are optimized and efficient
-            - Include data validation steps
-            - Consider data completeness and accuracy
-            - Align with audit standards and regulations
             """,
-            expected_output="Detailed audit plan with specific procedures and SQL queries, stored in 'result' variable",
+            expected_output="Analysis of the dataset to achieve the audit goal. output of the analysis should be assigned to the 'result' variable",
             agent=self.agent,
         )

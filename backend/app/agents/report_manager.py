@@ -18,8 +18,8 @@ class AuditReportManager:
     
     def _setup_llm(self) -> LLM:
         return LLM(
-            model="groq/llama3-8b-8192",
-            api_key=settings.GROQ_API_KEY,
+            model="gpt-4o",
+            api_key=settings.OPENAI_API_KEY,
             temperature=0.4,
             max_tokens=5000
         )
@@ -33,12 +33,9 @@ class AuditReportManager:
         """
         return Agent(
             role='Audit Report Manager',
-            goal='Create comprehensive and compelling audit reports with clear insights and recommendations',
-            backstory="""You are an experienced Audit Report Manager with expertise in 
-            synthesizing complex findings into clear, actionable reports. You excel at 
-            communicating technical findings to various stakeholders and providing 
-            strategic recommendations based on audit results. Your reports bridge the gap
-            between technical details and business implications.""",
+            goal='Create comprehensive and compelling audit reports that provide clear insights and actionable recommendations.',
+            backstory="""ou are a renowned Manager Auditor, celebrated for your ability to produce insightful and impactful audit reports. 
+    Your reports distill complex audit findings into clear, accessible, and actionable insights, making them highly valuable to stakeholders.""",
             verbose=True,
             llm=self.llm,
             max_iter=1,
@@ -55,35 +52,22 @@ class AuditReportManager:
         """
         return Task(
             description="""
-                Transform the technical audit findings into a clear, comprehensive report.
-                
-                Report Requirements:
-                1. Executive Summary:
-                   - Brief overview of audit scope
-                   - Key findings and recommendations
-                   - Overall risk assessment
-                
-                2. Detailed Findings:
-                   - Technical analysis results
-                   - Data anomalies and patterns
-                   - Supporting evidence and metrics
-                
-                3. Recommendations:
-                   - Actionable steps for improvement
-                   - Priority levels for each recommendation
-                   - Implementation considerations
-                
-                4. Conclusion:
-                   - Summary of critical points
-                   - Next steps and follow-up items
-                
-                Guidelines:
-                - Use clear, non-technical language
-                - Include relevant data visualizations
-                - Prioritize findings by business impact
-                - Provide context for technical findings
-                - Focus on actionable insights
+             Using the python dataset analysis results provided by the IT Auditor Team, write an engaging and comprehensive audit report.
+        Your report should be:
+        - Informative and accessible to a non-technical audience.
+        - Clear and concise, avoiding complex jargon to ensure readability.
+        - Comprehensive, covering the audit procedures and associated audit findings.
+        
+        Your report should include:
+        - A brief introduction that provides context for the audit.
+        - A detailed description of the performed audit procedures.
+        - A thorough presentation of the obtained audit findings, including payment details.
+        - Actionable recommendations based on the findings.
+        - A final conclusion that summarizes the key points and implications.
+        
+        The goal is to create a report that effectively communicates the audit findings and provides valuable insights to stakeholders. 
+        As the report-writing expert, you are responsible for producing this report without requesting additional information. Utilize the provided data and insights to complete your task effectively.
                 """,
-            expected_output="A comprehensive audit report formatted for clarity and impact",
+            expected_output="A full audit report presented in a clear and accessible manner.",
             agent=self.agent,
         )

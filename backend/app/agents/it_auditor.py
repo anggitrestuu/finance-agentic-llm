@@ -83,8 +83,8 @@ class ITAuditorAgent:
     
     def _setup_llm(self) -> LLM:
         return LLM(
-            model="groq/llama3-8b-8192",
-            api_key=settings.GROQ_API_KEY,
+            model="gpt-4o",
+            api_key=settings.OPENAI_API_KEY,
             temperature=0.4,
             max_tokens=5000
         )
@@ -93,12 +93,9 @@ class ITAuditorAgent:
         """Create and configure the IT Auditor agent"""
         return Agent(
             role='IT Auditor',
-            goal='Perform detailed technical analysis of financial data and systems',
-            backstory="""You are a skilled IT Auditor specializing in data analysis and 
-            system investigations. Your expertise includes database analysis, pattern 
-            recognition, and technical control assessment. You are well-versed in understanding
-            database schemas and relationships between tables for different audit categories.
-            You work closely with the Senior Auditor to provide detailed technical insights.""",
+            goal='Given the information provided by Senior Auditor, analyze the targeted dataset to achieve the audit goal.',
+            backstory="""You are a senior Senior IT Auditor with extensive experience in software and its best practices.
+            	You have expertise in analyzing dataset given the criteria and goals using SQL Query""",
             verbose=True,
             llm=self.llm,
             tools=self.db_tools.tools,
@@ -112,21 +109,13 @@ class ITAuditorAgent:
         """Create and return the IT Auditor's task"""
         return Task(
             description="""
-                Follow these steps sequentially:
-                1. Review and understand the Senior Auditor's audit plan
-                2. Analyze the database schema for the given audit category
-                3. Validate and verify the proposed SQL queries
-                4. Execute queries with appropriate limits for testing
-                5. Remove limits for final execution if results are valid
-                6. Analyze results considering data relationships
-                7. Document findings for the audit report
-                
-                Important considerations:
-                - Always test queries with limits first
-                - Validate data integrity across related tables
-                - Document any anomalies or patterns found
-                - Prepare clear, structured output for reporting
+                You need to do this in sequence:
+                    1. Read and understand the specific audit plan by Senior Auditor
+                    2. Read the SQL Query based on the provided information and audit plan
+                    3. Execute the SQL Query one by one
+                    4. Make sure to limit the output first before implementing no limit condition, to reduce token for the context window
+                    5. List the findings and write it for the next agent to be for the audit report
             """,
-            expected_output="Comprehensive analysis results stored in the 'result' variable",
+            expected_output="Analysis of the dataset to achieve the audit goal. output of the analysis should be assigned to the 'result' variable.",
             agent=self.agent,
         )
