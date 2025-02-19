@@ -142,8 +142,6 @@ function updateLogs(logs) {
   formattedLogs = formattedLogs
     // Remove ANSI formatting characters
     .replace(/\[\d+m\[\d+m|\[\d+m/g, '')
-    // Remove agent name after "Agent:"
-    .replace(/# Agent:\s*[^#\n]+/g, '# Agent')
     // Remove extra text after "Task:"
     .replace(/## Task:\s*[^#\n]+/g, '## Task')
     // Clean up any double newlines that might result
