@@ -48,7 +48,8 @@ def init_websocket_routes(agent_coordinator: AgentCoordinator) -> APIRouter:
                     formatted_response = {
                         "type": "agent_response",
                         "timestamp": datetime.now().isoformat(),
-                        "data": response
+                        "data": response.get("result"),
+                        "logs": response.get("logs")
                     }
                     
                     # Store in chat history

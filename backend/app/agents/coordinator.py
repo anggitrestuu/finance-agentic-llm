@@ -5,6 +5,9 @@ from .report_manager import AuditReportManager
 from ..database.models import DatabaseManager
 from ..services.dataset_service import DatasetService
 from crewai import Crew
+import io
+import sys
+from contextlib import redirect_stdout
 
 class ChatHistory:
     """Manages chat history for multiple clients"""
@@ -85,13 +88,13 @@ class AgentCoordinator:
         return Crew(
             agents=[
                 self.senior_auditor.agent, 
-                self.it_auditor.agent, 
-                self.report_manager.agent
+                # self.it_auditor.agent, 
+                # self.report_manager.agent
             ],
             tasks=[
                 interpret_task, 
-                it_auditor_task, 
-                report_manager_task
+                # it_auditor_task, 
+                # report_manager_task
             ],
             max_rpm=20,
             max_tokens=4000,
@@ -116,14 +119,24 @@ class AgentCoordinator:
             chat_context = self.chat_history.get_context(client_id)
             enhanced_message = f"{chat_context}\nCurrent question: {message}"
             
-            # Setup and execute crew
+            # Setup crew
             crew = self._setup_crew(enhanced_message, category, schemas)
-            result = crew.kickoff()
+            
+            # Capture stdout during crew.kickoff()
+            captured_output = io.StringIO()
+            with redirect_stdout(captured_output):
+                result = crew.kickoff()
+                
+            # Get the captured logs
+            logs = captured_output.getvalue()
             
             # Update chat history with new conversation
             self.chat_history.add_conversation(client_id, message, result.raw)
             
-            return result.raw
+            return {
+                "result": result.raw,
+                "logs": logs
+            }
             
         except ValueError as ve:
             return {

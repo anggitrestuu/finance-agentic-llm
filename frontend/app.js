@@ -107,7 +107,52 @@ function handleAgentResponse(response) {
 
   if (response.type === 'agent_response') {
     addMessageToChat('assistant', formatAgentResponse(response.data));
+    
+    // Add logs to the logs panel if they exist
+    if (response.logs) {
+      updateLogs(response.logs);
+    }
   }
+}
+
+// Logs Panel Functions
+const logsPanel = document.getElementById('logs-panel');
+const toggleLogsBtn = document.getElementById('toggle-logs');
+const logsContent = document.getElementById('logs-content');
+
+toggleLogsBtn.addEventListener('click', () => {
+  const isShowing = logsPanel.classList.toggle('show');
+  toggleLogsBtn.textContent = isShowing ? 'Hide Logs' : 'Show Logs';
+});
+
+function updateLogs(logs) {
+  // Clear previous logs
+  logsContent.innerHTML = '';
+  
+  // Create a pre element for formatted logs
+  const preElement = document.createElement('pre');
+  preElement.classList.add('logs-pre');
+  
+  // Format logs as JSON with indentation
+  let formattedLogs = typeof logs === 'string'
+    ? logs
+    : JSON.stringify(logs, null, 2);
+  
+  // Normalize text by removing specific patterns
+  formattedLogs = formattedLogs
+    // Remove ANSI formatting characters
+    .replace(/\[\d+m\[\d+m|\[\d+m/g, '')
+    // Remove agent name after "Agent:"
+    .replace(/# Agent:\s*[^#\n]+/g, '# Agent')
+    // Remove extra text after "Task:"
+    .replace(/## Task:\s*[^#\n]+/g, '## Task')
+    // Clean up any double newlines that might result
+    .replace(/\n\s*\n/g, '\n');
+    
+  preElement.textContent = formattedLogs;
+  
+  // Add to logs panel
+  logsContent.appendChild(preElement);
 }
 
 function addMessageToChat(role, content, type = 'normal') {
