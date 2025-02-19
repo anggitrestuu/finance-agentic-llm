@@ -263,10 +263,34 @@ body {
 }
 
 /* Input Area Styles */
+/* Empty State Styles */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.empty-state p {
+  max-width: 400px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Hide empty state when messages exist */
+.chat-messages:has(.message) .empty-state,
+.logs-content:has(.logs-pre) .empty-state {
+  display: none;
+}
+
 .chat-input-container {
   display: flex;
-  gap: 12px;
-  padding: 24px;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
   background-color: var(--background-color);
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   border-top: 1px solid var(--border-color);
@@ -274,16 +298,17 @@ body {
 
 #chat-input {
   flex: 1;
-  padding: 16px;
+  padding: 10px 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   resize: none;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: inherit;
   transition: border-color 0.2s ease;
-  min-height: 56px;
+  min-height: 42px;
   max-height: 200px;
   overflow-y: auto;
+  line-height: 1.4;
 }
 
 #chat-input:focus {
@@ -292,10 +317,10 @@ body {
   box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
 }
 
-#send-btn {
-  padding: 0 24px;
-  height: 56px;
-  background-color: var(--accent-color);
+/* Action Buttons */
+#send-btn, #reset-btn, .toggle-logs-btn {
+  padding: 0 16px;
+  height: 42px;
   color: var(--white);
   border: none;
   border-radius: var(--border-radius);
@@ -305,27 +330,30 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.9rem;
 }
 
-#send-btn:hover {
-  background-color: var(--accent-hover);
-  transform: translateY(-1px);
+#send-btn {
+  background-color: var(--accent-color);
+  min-width: 80px;
+}
+
+#reset-btn, .toggle-logs-btn {
+  min-width: 42px;
+  margin-left: 4px;
 }
 
 #reset-btn {
-  padding: 0 24px;
-  height: 56px;
   background-color: var(--error-color);
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
+}
+
+.toggle-logs-btn {
+  background-color: var(--accent-color);
+}
+
+#send-btn:hover, .toggle-logs-btn:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
 }
 
 #reset-btn:hover {
@@ -372,29 +400,10 @@ body {
   background-color: var(--background-color);
 }
 
-.toggle-logs-btn {
-  position: fixed;
-  right: 24px;
-  bottom: 10px;
-  padding: 12px 24px;
-  background-color: var(--accent-color);
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  z-index: 1001;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  box-shadow: var(--shadow);
-}
 
 .toggle-logs-btn:hover {
   background-color: var(--accent-hover);
-  transform: translateY(-2px);
-}
-
-.logs-panel.show .backdrop {
-  display: block;
+  transform: translateY(-1px);
 }
 
 /* Close Button */
@@ -412,17 +421,6 @@ body {
 
 .close-logs-btn:hover {
   transform: scale(1.1);
-}
-
-/* Adjust show logs button when panel is open */
-.logs-panel.show + .toggle-logs-btn {
-  right: 1224px;
-}
-
-@media (max-width: 768px) {
-  .logs-panel.show + .toggle-logs-btn {
-    right: 24px;
-  }
 }
 
 /* Responsive Design */

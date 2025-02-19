@@ -154,6 +154,12 @@ closeLogsBtn.addEventListener('click', () => {
 });
 
 function updateLogs(logs) {
+  // Hide empty state when adding logs
+  const emptyState = logsContent.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.style.display = 'none';
+  }
+
   // Clear previous logs
   logsContent.innerHTML = '';
   
@@ -182,6 +188,12 @@ function updateLogs(logs) {
 }
 
 function addMessageToChat(role, content, type = 'normal') {
+  // Hide empty state when adding first message
+  const emptyState = chatMessages.querySelector('.empty-state');
+  if (emptyState) {
+    emptyState.style.display = 'none';
+  }
+
   const messageNode = messageTemplate.content.cloneNode(true);
   const messageDiv = messageNode.querySelector('.message');
   const messageRole = messageNode.querySelector('.message-role');

@@ -25,20 +25,28 @@
 
         <div class="main-content">
             <div class="chat-container">
-                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="empty-state">
+                        <p>No messages yet. Start a conversation by selecting a category and asking a question.</p>
+                    </div>
+                </div>
                 <div class="chat-input-container">
                     <textarea id="chat-input" placeholder="Ask a question about audit analysis..."></textarea>
                     <button id="send-btn">Send</button>
-                    <button id="reset-btn">Reset Chat</button>
+                    <button id="toggle-logs" class="toggle-logs-btn">Show Logs</button>
+                    <button id="reset-btn">Reset</button>
                 </div>
             </div>
-            <button id="toggle-logs" class="toggle-logs-btn">Show Logs</button>
             <div id="logs-panel" class="logs-panel">
                 <div class="logs-header">
                     <h2>Agent Logs</h2>
                     <button id="close-logs-btn" class="close-logs-btn">&times;</button>
                 </div>
-                <div id="logs-content" class="logs-content"></div>
+                <div id="logs-content" class="logs-content">
+                    <div class="empty-state">
+                        <p>No logs available yet. Logs will appear here when you start interacting with the system.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
