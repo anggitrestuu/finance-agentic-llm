@@ -68,6 +68,7 @@ const chatMessages = document.getElementById('chat-messages');
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-btn');
 const messageTemplate = document.getElementById('message-template');
+const loadingTemplate = document.getElementById('loading-template');
 const categoryButtons = document.querySelectorAll('.category-btn');
 
 // Initialize chat service
@@ -94,12 +95,24 @@ function sendMessage() {
   const message = chatInput.value.trim();
   if (message) {
     addMessageToChat('user', message);
+    
+    // Show loading indicator
+    const loadingNode = loadingTemplate.content.cloneNode(true);
+    const loadingTime = loadingNode.querySelector('.message-time');
+    loadingTime.textContent = new Date().toLocaleTimeString();
+    chatMessages.appendChild(loadingNode);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
     chatService.sendMessage(message);
     chatInput.value = '';
   }
 }
 
 function handleAgentResponse(response) {
+  // Remove any existing loading indicators
+  const loadingIndicators = chatMessages.querySelectorAll('.message.loading');
+  loadingIndicators.forEach(indicator => indicator.remove());
+
   if (response.type === 'error') {
     addMessageToChat('system', `Error: ${response.message}`, 'error');
     return;

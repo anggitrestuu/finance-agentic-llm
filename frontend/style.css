@@ -312,6 +312,27 @@ body {
   transform: translateY(-1px);
 }
 
+#reset-btn {
+  padding: 0 24px;
+  height: 56px;
+  background-color: var(--error-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+
+#reset-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
 /* Logs Panel Styles */
 .logs-panel {
   position: fixed;
@@ -401,7 +422,43 @@ body {
   }
 }
 
-/* Animations */
+/* Loading Indicator */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  opacity: 0.6;
+}
+
+.typing-dots span:nth-child(1) { animation: typingDot 1s infinite 0s; }
+.typing-dots span:nth-child(2) { animation: typingDot 1s infinite 0.2s; }
+.typing-dots span:nth-child(3) { animation: typingDot 1s infinite 0.4s; }
+
+.loading-text {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+@keyframes typingDot {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Message Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;

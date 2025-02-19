@@ -29,6 +29,7 @@
                 <div class="chat-input-container">
                     <textarea id="chat-input" placeholder="Ask a question about audit analysis..."></textarea>
                     <button id="send-btn">Send</button>
+                    <button id="reset-btn">Reset Chat</button>
                 </div>
             </div>
             <button id="toggle-logs" class="toggle-logs-btn">Show Logs</button>
@@ -40,6 +41,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Loading indicator template -->
+    <template id="loading-template">
+        <div class="message assistant loading">
+            <div class="message-header">
+                <span class="message-role">Audit Assistant</span>
+                <span class="message-time"></span>
+            </div>
+            <div class="message-content">
+                <div class="loading-indicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="loading-text">Processing your request...</div>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <!-- Message template -->
     <template id="message-template">
