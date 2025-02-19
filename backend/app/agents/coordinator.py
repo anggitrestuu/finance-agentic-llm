@@ -88,13 +88,13 @@ class AgentCoordinator:
         return Crew(
             agents=[
                 self.senior_auditor.agent, 
-                # self.it_auditor.agent, 
-                # self.report_manager.agent
+                self.it_auditor.agent, 
+                self.report_manager.agent
             ],
             tasks=[
                 interpret_task, 
-                # it_auditor_task, 
-                # report_manager_task
+                it_auditor_task, 
+                report_manager_task
             ],
             max_rpm=20,
             max_tokens=4000,
