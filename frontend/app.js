@@ -75,6 +75,9 @@ const categoryButtons = document.querySelectorAll('.category-btn');
 const chatService = new ChatService();
 
 // Event Listeners
+const resetButton = document.getElementById('reset-btn');
+resetButton.addEventListener('click', () => window.location.reload());
+
 sendButton.addEventListener('click', sendMessage);
 chatInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
@@ -133,9 +136,21 @@ const logsPanel = document.getElementById('logs-panel');
 const toggleLogsBtn = document.getElementById('toggle-logs');
 const logsContent = document.getElementById('logs-content');
 
+// Close logs button
+const closeLogsBtn = document.getElementById('close-logs-btn');
+
+// Toggle and close logs functionality
+function toggleLogs(show) {
+  logsPanel.classList.toggle('show', show);
+  toggleLogsBtn.textContent = show ? 'Hide Logs' : 'Show Logs';
+}
+
 toggleLogsBtn.addEventListener('click', () => {
-  const isShowing = logsPanel.classList.toggle('show');
-  toggleLogsBtn.textContent = isShowing ? 'Hide Logs' : 'Show Logs';
+  toggleLogs(!logsPanel.classList.contains('show'));
+});
+
+closeLogsBtn.addEventListener('click', () => {
+  toggleLogs(false);
 });
 
 function updateLogs(logs) {

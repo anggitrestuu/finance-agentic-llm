@@ -393,6 +393,38 @@ body {
   transform: translateY(-2px);
 }
 
+.logs-panel.show .backdrop {
+  display: block;
+}
+
+/* Close Button */
+.close-logs-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.close-logs-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Adjust show logs button when panel is open */
+.logs-panel.show + .toggle-logs-btn {
+  right: 1224px;
+}
+
+@media (max-width: 768px) {
+  .logs-panel.show + .toggle-logs-btn {
+    right: 24px;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .container {
