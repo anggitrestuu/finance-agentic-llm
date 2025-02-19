@@ -8,6 +8,8 @@ from crewai import Crew
 import io
 import sys
 from contextlib import redirect_stdout
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 class ChatHistory:
     """Manages chat history for multiple clients"""
@@ -55,6 +57,9 @@ class AgentCoordinator:
         # Initialize chat history manager
         self.chat_history = ChatHistory(max_history=max_history)
         
+        # Initialize thread pool for CPU-bound operations
+        self.executor = ThreadPoolExecutor(max_workers=5)
+        
         # Initialize agents
         self._initialize_agents()
 
@@ -101,6 +106,21 @@ class AgentCoordinator:
             verbose=True
         )
     
+    async def _run_crew_kickoff(self, crew: Crew) -> tuple[Any, str]:
+        """Execute crew.kickoff() in a separate thread"""
+        captured_output = io.StringIO()
+        
+        def run_kickoff():
+            with redirect_stdout(captured_output):
+                try:
+                    return crew.kickoff()
+                except Exception as crew_error:
+                    return str(crew_error)
+        
+        # Run CPU-bound crew.kickoff() in thread pool
+        result = await asyncio.to_thread(run_kickoff)
+        return result, captured_output.getvalue()
+    
     async def execute_audit(self, audit_info: Dict[str, Any]) -> Dict[str, Any]:
         """Execute the full audit process with proper error handling"""
         try:
@@ -122,30 +142,17 @@ class AgentCoordinator:
             # Setup crew
             crew = self._setup_crew(enhanced_message, category, schemas)
             
-            # Capture stdout during crew.kickoff()
-            captured_output = io.StringIO()
-            with redirect_stdout(captured_output):
-                try:
-                    result = crew.kickoff()
-                except Exception as crew_error:
-                    # Handle specific API errors
-                    error_message = str(crew_error)
-                    return {
-                        "status": "success",
-                        "result": error_message,
-                        "logs": captured_output.getvalue()
-                    }
-                    
-            # Get the captured logs
-            logs = captured_output.getvalue()
+            # Run crew.kickoff() asynchronously
+            result, logs = await self._run_crew_kickoff(crew)
             
-            # Update chat history with new conversation
+            # Format response
             if hasattr(result, 'raw'):
-                self.chat_history.add_conversation(client_id, message, result.raw)
                 response = result.raw
             else:
                 response = str(result)
-                self.chat_history.add_conversation(client_id, message, response)
+            
+            # Update chat history
+            self.chat_history.add_conversation(client_id, message, response)
             
             return {
                 "status": "success",
