@@ -125,26 +125,45 @@ class AgentCoordinator:
             # Capture stdout during crew.kickoff()
             captured_output = io.StringIO()
             with redirect_stdout(captured_output):
-                result = crew.kickoff()
-                
+                try:
+                    result = crew.kickoff()
+                except Exception as crew_error:
+                    # Handle specific API errors
+                    error_message = str(crew_error)
+                    return {
+                        "status": "success",
+                        "result": error_message,
+                        "logs": captured_output.getvalue()
+                    }
+                    
             # Get the captured logs
             logs = captured_output.getvalue()
             
             # Update chat history with new conversation
-            self.chat_history.add_conversation(client_id, message, result.raw)
+            if hasattr(result, 'raw'):
+                self.chat_history.add_conversation(client_id, message, result.raw)
+                response = result.raw
+            else:
+                response = str(result)
+                self.chat_history.add_conversation(client_id, message, response)
             
             return {
-                "result": result.raw,
+                "status": "success",
+                "result": response,
                 "logs": logs
             }
             
         except ValueError as ve:
             return {
                 "status": "error",
-                "error": f"Validation error: {str(ve)}"
+                "error": "Validation error",
+                "error_details": str(ve),
+                "logs": ""
             }
         except Exception as e:
             return {
                 "status": "error",
-                "error": f"Unexpected error: {str(e)}"
+                "error": "Unexpected error",
+                "error_details": str(e),
+                "logs": ""
             }
